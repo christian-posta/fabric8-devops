@@ -1,3 +1,0 @@
-remote_path: "{{ lookup('env', 'FABRIC8_ANSIBLE_REMOTE_PATH') }}"
-user_name: "{{ lookup('env', 'FABRIC8_ANSIBLE_USER_NAME') }}"
-user_group: "{{ lookup('env', 'FABRIC8_ANSIBLE_USER_GROUP') }}"

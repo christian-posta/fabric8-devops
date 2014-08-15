@@ -5,7 +5,7 @@
 - name: Extract the archive
   command: chdir="{{ remote_path }}" creates="{{ fabric8_location }}" /usr/bin/unzip "{{ fabric8_file_name  }}"
 
-- name: Change ownership of fuse8 installation
+- name: Change ownership of fabric8 installation
   file: path="{{ fabric8_location }}" owner="{{ user_name }}" group="{{ user_group }}" state=directory recurse=yes
 
 - name: Create directories for keys
@@ -13,4 +13,30 @@
 
 - name: Install private key for accessing other nodes in the cluster
   copy: src=private-key.pem dest=/opt/keys/private-key.pem group="{{ user_group }}" owner="{{ user_name }}"
+  
+- name: Add a user to users.properties to use from the command-line client
+  lineinfile: dest="{{ fabric8_location }}/etc/users.properties" state=present regexp='^#?admin=' line='admin=admin,admin' 
+
+- name: Create wrapper-script directory
+  command: creates="{{ fabric8_location }}/scripts" /bin/mkdir "{{ fabric8_location }}/scripts"
+  
+- name: Copy over wrapper-script
+  copy: src="wrapper-install.karaf" dest="{{ fabric8_location }}/scripts/wrapper-install.karaf"
+  
+- name: Start Fabric8/Fuse
+  command: /sbin/runuser -l fabric8 -c '{{ fabric8_location }}/bin/start'
+  
+- name: Wait for Fabric8/fuse to startup (http listener)
+  wait_for: port=8181 delay=5
+  
+- name: Run the wrapper install commands
+  command: /sbin/runuser -l fabric8 -c '{{ fabric8_location }}/bin/client -r 3 -a 8101 -u admin -p admin shell:source file://{{ fabric8_location }}/scripts/wrapper-install.karaf'
+  
+- name: Wait for init.d scripts to be produced
+  wait_for: path="{{ fabric8_location }}/bin/fabric8-service" timeout=10
+  
+- name: Shutdown Fabric8/fuse
+  command: /sbin/runuser -l fabric8 -c '{{ fabric8_location }}/bin/stop'
+  
+- name: Link to init.d
 

@@ -1,9 +1,0 @@
----
-- name: Make remote path
-  command: creates="{{ remote_path }}" /bin/mkdir -p "{{ remote_path }}"
-  
-- name: Add group fabric8
-  group: name="{{ user_group }}" state=present
-
-- name: Add user fabric8
-  user: name="{{ user_name }}" group="{{ user_group }}" home="/home/{{ user_name }}"

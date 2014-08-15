@@ -3,14 +3,21 @@
   vars: 
       remote_path: "{{ lookup('env', 'FABRIC8_ANSIBLE_REMOTE_PATH') }}"
       fabric8_name: "{{ lookup('env', 'FABRIC8_ANSIBLE_NAME')  }}"
-      full_path: "{{ remote_path }}/{{ fabric8_name }}"
+      fabric8_location: "{{ remote_path }}/{{ fabric8_name }}"
   remote_user: cloud-user
   sudo: yes
   tasks:
+  - name: List bin dir
+    command: /bin/ls {{ fabric8_location }}/bin
+    register: ls_output
+
+  - name: Debug bin dir
+    debug: var=ls_output
+    
   - name: Stop Fabric8
-    command: chdir={{ full_path }} {{ item }}
+    command: chdir={{ fabric8_location }} {{ item }}
     with_items:
-      - /usr/bin/jps -l | /usr/bin/grep karaf | /usr/bin/cut -d ' ' -f 1 | /usr/bin/xargs -n1 /bin/kill -kill
+      - /sbin/runuser -l fabric8 -c "/usr/bin/jps -l | /bin/grep karaf | /bin/cut -d ' ' -f 1 | /usr/bin/xargs -n1 /bin/kill -kill"
       - /bin/rm -rf instances/ processes/
       - /bin/rm -rf data/cache
       - /bin/rm -rf data/git
@@ -20,5 +27,8 @@
       - /bin/rm -rf data/pax-web-jsp
       - /bin/rm -rf data/tmp
       - /bin/rm -rf data/log
+      - /bin/rm bin/fabric8-service
+      - /bin/rm bin/fabric8-wrapper
+      - /bin/rm etc/fabric8-wrapper.conf      
     
 

@@ -1,5 +1,5 @@
 ---
-- hosts: ensemble
+- hosts: root-ensemble
   vars: 
       remote_path: "{{ lookup('env', 'FABRIC8_ANSIBLE_REMOTE_PATH') }}"
       fabric8_name: "{{ lookup('env', 'FABRIC8_ANSIBLE_NAME')  }}"
@@ -9,7 +9,7 @@
   - name: Stop Fabric8
     command: chdir={{ remote_path }} {{ item }}
     with_items:
-      - /usr/bin/jps -l | /usr/bin/grep karaf | /usr/bin/cut -d ' ' -f 1 | /usr/bin/xargs -n1 /bin/kill -kill
+      - /sbin/runuser -l fabric8 -c "/usr/bin/jps -l | /usr/bin/grep karaf | /usr/bin/cut -d ' ' -f 1 | /usr/bin/xargs -n1 /bin/kill -kill"
       - /bin/rm -rf instances/ processes/
       - /bin/rm -rf data/cache
       - /bin/rm -rf data/git
@@ -21,6 +21,6 @@
       - /bin/rm -rf data/log
 
   - name: Remove Fabric8
-    command: /bin/rm -fr "{{ remote_path }}/{{ fabric8_name }}/containers"
+    command: /bin/rm -fr "{{ remote_path }}/{{ fabric8_name }}"
     
 
