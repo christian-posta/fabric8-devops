@@ -14,6 +14,9 @@
   - name: Debug bin dir
     debug: var=ls_output
     
+  - name: Stop the fabric8 service if there is one
+    command: /sbin/service fabric8-service stop
+    
   - name: Stop Fabric8
     command: chdir={{ fabric8_location }} {{ item }}
     with_items:

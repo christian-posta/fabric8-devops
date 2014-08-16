@@ -33,10 +33,20 @@
   command: /sbin/runuser -l fabric8 -c '{{ fabric8_location }}/bin/client -r 3 -a 8101 -u admin -p admin shell:source file://{{ fabric8_location }}/scripts/wrapper-install.karaf'
   
 - name: Wait for init.d scripts to be produced
-  wait_for: path="{{ fabric8_location }}/bin/fabric8-service" timeout=10
+  wait_for: path="{{ fabric8_location }}/bin/{{ chkconfig_service_name }}-service" timeout=10
   
 - name: Shutdown Fabric8/fuse
   command: /sbin/runuser -l fabric8 -c '{{ fabric8_location }}/bin/stop'
   
 - name: Link to init.d
+  file: src="{{ fabric8_location }}/bin/{{ chkconfig_service_name }}-service" dest="/etc/init.d/{{ chkconfig_service_name }}-service" state=link
+  
+- name: Add service to chkconfig
+  command: /sbin/chkconfig fabric8-service --add
+  
+- name: Auto start service when server started
+  command: /sbin/chkconfig fabric8-service on
+  
+- name: Start the fabric8 service
+  command: /sbin/service fabric8-service start
 

@@ -23,4 +23,11 @@
   - name: Remove Fabric8
     command: /bin/rm -fr "{{ remote_path }}/{{ fabric8_name }}"
     
+  - name: Remove fabric8 chkconfig service
+    command: {{ item }}
+    with_items:
+      - /sbin/service fabric8-service stop
+      - /sbin/chkconfig fabric8-service --del
+      - /bin/rm /etc/init.d/fabric8-service
+    
 
