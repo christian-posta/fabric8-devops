@@ -30,7 +30,7 @@
   wait_for: port=8181 delay=5
   
 - name: Run the wrapper install commands
-  command: /sbin/runuser -l fabric8 -c '{{ fabric8_location }}/bin/client -r 3 -a 8101 -u admin -p admin shell:source file://{{ fabric8_location }}/scripts/wrapper-install.karaf'
+  command: creates="{{ fabric8_location }}/bin/{{ chkconfig_service_name }}-service" /sbin/runuser -l fabric8 -c '{{ fabric8_location }}/bin/client -r 3 -a 8101 -u admin -p admin shell:source file://{{ fabric8_location }}/scripts/wrapper-install.karaf'
   
 - name: Wait for init.d scripts to be produced
   wait_for: path="{{ fabric8_location }}/bin/{{ chkconfig_service_name }}-service" timeout=10
@@ -48,5 +48,6 @@
   command: /sbin/chkconfig fabric8-service on
   
 - name: Start the fabric8 service
+  sudo_user: fabric8
   command: /sbin/service fabric8-service start
 

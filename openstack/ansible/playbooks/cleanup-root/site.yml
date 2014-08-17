@@ -6,16 +6,10 @@
       fabric8_location: "{{ remote_path }}/{{ fabric8_name }}"
   remote_user: cloud-user
   sudo: yes
-  tasks:
-  - name: List bin dir
-    command: /bin/ls {{ fabric8_location }}/bin
-    register: ls_output
-
-  - name: Debug bin dir
-    debug: var=ls_output
-    
+  tasks:    
   - name: Stop the fabric8 service if there is one
     command: /sbin/service fabric8-service stop
+    ignore_errors: yes
     
   - name: Stop Fabric8
     command: chdir={{ fabric8_location }} {{ item }}
@@ -33,5 +27,6 @@
       - /bin/rm bin/fabric8-service
       - /bin/rm bin/fabric8-wrapper
       - /bin/rm etc/fabric8-wrapper.conf      
+    ignore_errors: yes
     
 
